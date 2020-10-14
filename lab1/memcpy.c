@@ -1,0 +1,21 @@
+#include <stdlib.h>
+#include <stdint.h>
+
+void *my_memcpy(void *restrict dst, const void *restrict src, size_t n) {
+
+    void *s_dst = dst;
+    for (size_t i = 0; i < n / sizeof(uint64_t); ++i)
+    {
+        *(uint64_t*)dst = *(uint64_t*)src;
+        dst = (uint64_t*)dst + 1;
+        src = (uint64_t*)src + 1;
+    }
+    for (size_t i = 0; i < n % sizeof(uint64_t); ++i)
+    {
+        *(char*)dst = *(char*)src;
+        dst = (char*)dst + 1;
+        src = (char*)src + 1;
+    }
+    
+    return s_dst;
+}
