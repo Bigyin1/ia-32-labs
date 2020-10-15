@@ -14,23 +14,17 @@ void tester(size_t sz) {
     if (!src_my || !src_lib || !dst_lib || !dst_my) exit(1);
 
     printf("testing on 0x%zx bytes\n", sz);
-    clock_t mean = 0;
+    clock_t mean = clock();
     for (size_t i = 0; i < TEST_ITERS; ++i) {
-        clock_t t = clock();
         my_memcpy(dst_my, src_my, sz);
-        mean += clock() - t;
     }
-    mean /= TEST_ITERS;
-    printf("\tmy memcpy:\t\t%.10f seconds\n", (double) mean / CLOCKS_PER_SEC);
+    printf("\tmy memcpy:\t\t%.10f clocks\n", (double)(clock() - mean) / TEST_ITERS);
 
-    mean = 0;
+    mean = clock();
     for (size_t i = 0; i < TEST_ITERS; ++i) {
-        clock_t t = clock();
         memcpy(dst_lib, src_lib, sz);
-        mean += clock() - t;
     }
-    mean /= TEST_ITERS;
-    printf("\tlibc memcpy:\t%.10f seconds\n", (double) mean / CLOCKS_PER_SEC);
+    printf("\tlibc memcpy:\t%.10f clocks\n", (double)(clock() - mean) / TEST_ITERS);
     printf("test done\n");
     free(src_lib);
     free(src_my);
