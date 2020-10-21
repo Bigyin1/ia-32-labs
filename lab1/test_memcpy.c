@@ -3,7 +3,7 @@
 #include <time.h>
 #include <stdio.h>
 
-#define TEST_ITERS 4000
+#define TEST_ITERS 1000
 
 void tester(size_t sz) {
     void *src = malloc(sz);
@@ -22,7 +22,7 @@ void tester(size_t sz) {
 
 int main() {
 
-    size_t tests[4] = {64, 700, 1 << 12, 1 << 24};
+    size_t tests[4] = {16, 704, 1 << 10, 1 << 22};
 
     for (size_t i = 0; i < 4; i++) {
         tester(tests[i]);
