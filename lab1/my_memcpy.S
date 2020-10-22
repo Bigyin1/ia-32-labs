@@ -5,6 +5,28 @@ my_memcpy:
     push rbx
     mov rax, rdi
 
+    cmp rdx, 128
+    jl .pow_16
+
+.dest_align_32:
+    mov rcx, rdi
+    and rcx, 32 - 1
+    jz .pow_128
+
+    xor rcx, 32 - 1
+    add rcx, 1
+    sub rdx, rcx
+
+.aloop_1:
+    mov bl, [rsi]
+    mov [rdi], bl
+
+    add rsi, 1
+    add rdi, 1
+    sub rcx, 1
+    jnz .aloop_1
+
+
 .pow_128:
     mov [rsp-8], rdx
     and qword ptr [rsp-8], -128
@@ -19,10 +41,10 @@ my_memcpy:
     vmovups ymm1, [rsi+32]
     vmovups ymm2, [rsi+64]
     vmovups ymm3, [rsi+96]
-    vmovups [rdi], ymm0
-    vmovups [rdi+32], ymm1
-    vmovups [rdi+64], ymm2
-    vmovups [rdi+96], ymm3
+    vmovaps [rdi], ymm0
+    vmovaps [rdi+32], ymm1
+    vmovaps [rdi+64], ymm2
+    vmovaps [rdi+96], ymm3
 
     add rsi, 128
     add rdi, 128
