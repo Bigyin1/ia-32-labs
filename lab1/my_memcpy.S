@@ -2,6 +2,7 @@
 
 .globl	my_memcpy
 my_memcpy:
+    push rbx
     mov rax, rdi
 
 .pow_128:
@@ -31,7 +32,7 @@ my_memcpy:
 .pow_16:
     mov [rsp-8], rdx
     and qword ptr [rsp-8], -16
-    jz .pow_1 // power of 16
+    jz .pow_4 // power of 16
 
     sub rdx, [rsp-8]
     mov rcx, qword ptr [rsp-8]
@@ -47,10 +48,26 @@ my_memcpy:
     jnz .loop_16
 
 
+.pow_4:
+    mov [rsp-8], rdx
+    and qword ptr [rsp-8], -4
+    jz .pow_1
+
+    sub rdx, [rsp-8]
+    mov rcx, qword ptr [rsp-8]
+    shr rcx, 2
+.loop_4:
+    mov ebx, [rsi]
+    mov [rdi], ebx
+
+    add rsi, 4
+    add rdi, 4
+    sub rcx, 1
+    jnz .loop_4
+
 .pow_1:
     cmp rdx, 0
     je .end
-    push rbx
 .loop_1:
     mov bl, [rsi]
     mov [rdi], bl
@@ -60,7 +77,7 @@ my_memcpy:
     sub rdx, 1
     jnz .loop_1
 
-    pop rbx
 
 .end:
+    pop rbx
     ret
