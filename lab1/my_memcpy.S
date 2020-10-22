@@ -4,45 +4,16 @@
 my_memcpy:
     mov rax, rdi
 
+.pow_128:
     mov [rsp-8], rdx
-    and qword ptr [rsp-8], 16 - 1
+    and qword ptr [rsp-8], -128
     jz .pow_16 // power of 16
 
     sub rdx, [rsp-8]
     mov rcx, qword ptr [rsp-8]
-.pow_1:
-    mov bl, [rsi]
-    mov [rdi], bl
+    shr rcx, 7
 
-    add rsi, 1
-    add rdi, 1
-    sub rcx, 1
-    jnz .pow_1
-
-.pow_16:
-    mov [rsp-8], rdx
-    and qword ptr [rsp-8], 128 - 1
-    jz .pow_128 // power of 128
-
-    sub rdx, [rsp-8]
-    mov rcx, qword ptr [rsp-8]
-    shr rcx, 4
-.loop_16:
-    vmovups xmm0, [rsi]
-    vmovups [rdi], xmm0
-
-    add rsi, 16
-    add rdi, 16
-    sub rcx, 1
-    jnz .loop_16
-
-
-.pow_128:
-    shr rdx, 7
-    cmp rdx, 0
-    jz .end
 .loop_128:
-
     vmovups ymm0, [rsi]
     vmovups ymm1, [rsi+32]
     vmovups ymm2, [rsi+64]
@@ -54,8 +25,42 @@ my_memcpy:
 
     add rsi, 128
     add rdi, 128
-    sub rdx, 1
+    sub rcx, 1
     jnz .loop_128
+
+.pow_16:
+    mov [rsp-8], rdx
+    and qword ptr [rsp-8], -16
+    jz .pow_1 // power of 16
+
+    sub rdx, [rsp-8]
+    mov rcx, qword ptr [rsp-8]
+    shr rcx, 4
+
+.loop_16:
+    vmovups xmm0, [rsi]
+    vmovups [rdi], xmm0
+
+    add rsi, 16
+    add rdi, 16
+    sub rcx, 1
+    jnz .loop_16
+
+
+.pow_1:
+    cmp rdx, 0
+    je .end
+    push rbx
+.loop_1:
+    mov bl, [rsi]
+    mov [rdi], bl
+
+    add rsi, 1
+    add rdi, 1
+    sub rdx, 1
+    jnz .loop_1
+
+    pop rbx
 
 .end:
     ret

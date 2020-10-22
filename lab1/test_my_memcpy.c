@@ -22,7 +22,7 @@ void tester(size_t sz) {
 
 int main() {
 
-    size_t tests[4] = {16, 704, 1 << 10, 1 << 22};
+    size_t tests[4] = {16, 700, 1 << 10, 1 << 22};
 
     for (size_t i = 0; i < 4; i++) {
         tester(tests[i]);
