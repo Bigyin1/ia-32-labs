@@ -15,14 +15,14 @@ void tester(size_t sz) {
     for (size_t i = 0; i < TEST_ITERS; ++i) {
         memcpy(dst, src, sz);
     }
-    printf("\tmy memcpy:\t\t%f clocks\n", (double)(clock() - mean) / TEST_ITERS);
+    printf("\tmemcpy:\t\t%f clocks\n", (double)(clock() - mean) / TEST_ITERS);
     free(src);
     free(dst);
 }
 
 int main() {
 
-    size_t tests[4] = {16, 700, 1 << 10, 1 << 22};
+    size_t tests[4] = {16, 700, 1 << 14, 1 << 22};
 
     for (size_t i = 0; i < 4; i++) {
         tester(tests[i]);

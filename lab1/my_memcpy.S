@@ -28,12 +28,11 @@ my_memcpy:
 
 
 .pow_128:
-    mov [rsp-8], rdx
-    and qword ptr [rsp-8], -128
+    mov rcx, rdx
+    and rcx, -128
     jz .pow_16 // power of 16
 
-    sub rdx, [rsp-8]
-    mov rcx, qword ptr [rsp-8]
+    sub rdx, rcx
     shr rcx, 7
 
 .loop_128:
@@ -52,12 +51,11 @@ my_memcpy:
     jnz .loop_128
 
 .pow_16:
-    mov [rsp-8], rdx
-    and qword ptr [rsp-8], -16
+    mov rcx, rdx
+    and rcx, -16
     jz .pow_4 // power of 16
 
-    sub rdx, [rsp-8]
-    mov rcx, qword ptr [rsp-8]
+    sub rdx, rcx
     shr rcx, 4
 
 .loop_16:
@@ -71,12 +69,11 @@ my_memcpy:
 
 
 .pow_4:
-    mov [rsp-8], rdx
-    and qword ptr [rsp-8], -4
+    mov rcx, rdx
+    and rcx, -4
     jz .pow_1
 
-    sub rdx, [rsp-8]
-    mov rcx, qword ptr [rsp-8]
+    sub rdx, rcx
     shr rcx, 2
 .loop_4:
     mov ebx, [rsi]
