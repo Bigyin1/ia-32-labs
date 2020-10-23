@@ -15,7 +15,7 @@ void tester(size_t sz) {
     for (size_t i = 0; i < TEST_ITERS; ++i) {
         my_memcpy(dst, src, sz);
     }
-    printf("\tmy_memcpy:\t\t%f clocks\n", (double)(clock() - mean) / TEST_ITERS);
+    printf("\tmy_memcpy:\t%f clocks\n", (double)(clock() - mean) / TEST_ITERS);
     free(src);
     free(dst);
 }
