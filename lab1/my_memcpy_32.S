@@ -10,31 +10,31 @@ my_memcpy:
     mov eax, edi
 
     cmp edx, 128
-    jl .pow_16
+    jl mul_16
 
 .dest_align_32:
     mov ecx, edi
     and ecx, 32 - 1
-    jz .pow_128
+    jz mul_128
 
     xor ecx, 32 - 1
     add ecx, 1
     sub edx, ecx
 
-.aloop_1:
+.aloop:
     mov bl, [esi]
     mov [edi], bl
 
     add esi, 1
     add edi, 1
     sub ecx, 1
-    jnz .aloop_1
+    jnz .aloop
 
 
-.pow_128:
+mul_128:
     mov ecx, edx
     and ecx, -128
-    jz .pow_16 // power of 16
+    jz mul_16 //muler of 16
 
     sub edx, ecx
     shr ecx, 7
@@ -54,10 +54,10 @@ my_memcpy:
     sub ecx, 1
     jnz .loop_128
 
-.pow_16:
+mul_16:
     mov ecx, edx
     and ecx, -16
-    jz .pow_4 // power of 16
+    jz mul_4 //muler of 16
 
     sub edx, ecx
     shr ecx, 4
@@ -72,10 +72,10 @@ my_memcpy:
     jnz .loop_16
 
 
-.pow_4:
+mul_4:
     mov ecx, edx
     and ecx, -4
-    jz .pow_1
+    jz mul_1
 
     sub edx, ecx
     shr ecx, 2
@@ -88,7 +88,7 @@ my_memcpy:
     sub ecx, 1
     jnz .loop_4
 
-.pow_1:
+mul_1:
     cmp edx, 0
     je .end
 .loop_1:
@@ -99,7 +99,6 @@ my_memcpy:
     add edi, 1
     sub edx, 1
     jnz .loop_1
-
 
 .end:
     pop ebx

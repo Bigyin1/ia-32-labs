@@ -6,54 +6,79 @@ my_memcpy:
     mov rax, rdi
 
     cmp rdx, 128
-    jl .pow_16
+    jl .mul_16
 
+# align destination pointer to 32 boundary
 .dest_align_32:
     mov rcx, rdi
     and rcx, 32 - 1
-    jz .pow_128
+    jz .mul_128
 
     xor rcx, 32 - 1
     add rcx, 1
     sub rdx, rcx
 
-.aloop_1:
+.aloop:
     mov bl, [rsi]
     mov [rdi], bl
 
     add rsi, 1
     add rdi, 1
     sub rcx, 1
-    jnz .aloop_1
+    jnz .aloop
 
 
-.pow_128:
+.mul_128:
     mov rcx, rdx
     and rcx, -128
-    jz .pow_16 // power of 16
+    jz .mul_16
 
     sub rdx, rcx
     shr rcx, 7
 
-.loop_128:
+    cmp rcx, 1 << 18 # use non-temporal stores, when size >= 32MiB
+    jl .loop_128_light
+
+.loop_128_heavy:
     vmovups ymm0, [rsi]
     vmovups ymm1, [rsi+32]
     vmovups ymm2, [rsi+64]
     vmovups ymm3, [rsi+96]
+
+    vmovntdq [rdi], ymm0
+    vmovntdq [rdi+32], ymm1
+    vmovntdq [rdi+64], ymm2
+    vmovntdq [rdi+96], ymm3
+
+
+    add rsi, 128
+    add rdi, 128
+    sub rcx, 1
+    jnz .loop_128_heavy
+
+    jmp .mul_16
+
+.loop_128_light:
+    vmovups ymm0, [rsi]
+    vmovups ymm1, [rsi+32]
+    vmovups ymm2, [rsi+64]
+    vmovups ymm3, [rsi+96]
+
     vmovaps [rdi], ymm0
     vmovaps [rdi+32], ymm1
     vmovaps [rdi+64], ymm2
     vmovaps [rdi+96], ymm3
 
+
     add rsi, 128
     add rdi, 128
     sub rcx, 1
-    jnz .loop_128
+    jnz .loop_128_light
 
-.pow_16:
+.mul_16:
     mov rcx, rdx
     and rcx, -16
-    jz .pow_4 // power of 16
+    jz .mul_4
 
     sub rdx, rcx
     shr rcx, 4
@@ -67,11 +92,10 @@ my_memcpy:
     sub rcx, 1
     jnz .loop_16
 
-
-.pow_4:
+.mul_4:
     mov rcx, rdx
     and rcx, -4
-    jz .pow_1
+    jz .mul_1
 
     sub rdx, rcx
     shr rcx, 2
@@ -84,7 +108,7 @@ my_memcpy:
     sub rcx, 1
     jnz .loop_4
 
-.pow_1:
+.mul_1:
     cmp rdx, 0
     je .end
 .loop_1:
@@ -95,7 +119,6 @@ my_memcpy:
     add rdi, 1
     sub rdx, 1
     jnz .loop_1
-
 
 .end:
     pop rbx

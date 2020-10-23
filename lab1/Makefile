@@ -8,16 +8,16 @@ SRC_MY_32 := my_memcpy_32.S test_my_memcpy.c
 SRC_LIB := test_memcpy.c
 
 test_my_memcpy_64: $(SRC_MY_64)
-	$(CC) $(CFLAGS) -m64 -g -o $@ $^
+	clang $(CFLAGS) -m64 -g -o $@ $^
 
 test_my_memcpy_32: $(SRC_MY_32)
-	$(CC) $(CFLAGS) -m32 -g -o $@ $^
+	clang $(CFLAGS) -m32 -g -o $@ $^
 
 test_memcpy_64: $(SRC_LIB)
 	$(CC) $(CFLAGS) -m64 -g -o $@ $^
 
 test_memcpy_32: $(SRC_LIB)
-	$(CC) $(CFLAGS) -m32 -g -o $@ $^
+	clang $(CFLAGS) -m32 -o $@ $^
 
 #clean:
 #	@rm -rf $(OBJ) $(EXEC)
